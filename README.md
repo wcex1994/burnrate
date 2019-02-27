@@ -64,7 +64,7 @@ In condition 3, edit threshold and actions once your burn rate is over the thres
 
 2. First day of month:
 
-The Consumption.UsageDetails.List API only returns current billing period's usage. Azure counts one month as a billing period. If you are on Feb 1st, then to calculate Jan 30th vs. Jan 31st burn rate, you would need to call Consumption.UsageDetails.ListByBillingPeriod API with '201901' as the billing period. See here <https://docs.microsoft.com/en-us/rest/api/consumption/usagedetails/listbybillingperiod> for more details.
+    The Consumption.UsageDetails.List API only returns current billing period's usage. Azure counts one month as a billing period. If you are on Feb 1st, then to calculate Jan 30th vs. Jan 31st burn rate, you would need to call Consumption.UsageDetails.ListByBillingPeriod API with '201901' as the billing period. See here <https://docs.microsoft.com/en-us/rest/api/consumption/usagedetails/listbybillingperiod> for more details.
 
 ## Additional Information
 
