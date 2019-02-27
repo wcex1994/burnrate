@@ -13,7 +13,7 @@ Follow **only** steps in the section "Create your logic app" here <https://docs.
 
 Now you will have an empty logic app. Open it and click "blank logic app" in the templates.  
 
-Pick "code view", and copy paste the whole logicapptemplate.txt here <https://github.com/wcex1994/burnrate/blob/master/logicapptemplate> into the window. Now go back to the designer view.
+Pick "code view", delete the content and copy paste the whole logicapptemplate.txt here <https://github.com/wcex1994/burnrate/blob/master/logicapptemplate> into the window. Now go back to the designer view.
 
 ## Step 2: Subsciption list
 
