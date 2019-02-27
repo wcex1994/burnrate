@@ -1,13 +1,11 @@
 # Burn Rate Alert
 It is a Azure burn rate calculation on logic app.
 
-Everyday at UTC 6am, it grabs the daily cost of all resources used on the day before yesterday (TDBY) and also three days before (ThreeDayBefore) by using Consumption API. Afterwards, it sums up each day's cost. The burn rate is calculated as an increase rate:
+Everyday at UTC 6:00 am, it grabs the daily cost of all resources used on the day before yesterday (TDBY) and also three days before (ThreeDayBefore) by using Azure Consumption API. Afterwards, it sums up each day's cost. The burn rate is calculated as an increase rate:
 
-Burn Rate = (TDBY - ThreeDayBefore)/ThreeDayBefore
+    Burn Rate = (TDBY - ThreeDayBefore)/ThreeDayBefore
 
-The reason why not calculate difference between yesterday and today is because some costs are calculated once per two days. TDBY and ThreeDayBefore turn out to be more stable. 
-
-## Step 1: Create an logic app
+## Step 1: Create a Logic App
 
 Follow **only** steps in the section "Create your logic app" here <https://docs.microsoft.com/en-us/azure/logic-apps/quickstart-create-first-logic-app-workflow>.
 
@@ -17,21 +15,21 @@ Pick "code view", delete the content and copy paste the whole logicapptemplate.t
 
 ## Step 2: Subsciption list
 
-In the "Sublist" variable, add in a list of subscription ID that you would like to calculate the burn rate.
+In the "Sublist" variable, add in a list of subscription IDs that you would like to calculate the burn rate.
 
 ![alt text](https://github.com/wcex1994/burnrate/blob/master/pictures/subscriptionid.jpg "sub_id")
 
-You can grab related information with the following PowerShell commands locally:
+You can grab related information with the following PowerShell commands:
 
 ```POWERSHELL
-Login-AzureRmAccount
 
+Login-AzureRmAccount
 Get-AzureRmSubscription | Export-Csv "C:\SOME_PATH\Azure Subscription.csv"
 ```
 
 ## Step 3: Managed Identity and IAM
 
-In order to be authenticated and aurthorized to call the Azure Comsumption API, we use Managed Identity and Identity and Access Management (IAM). Notice there might be better methods depends on your scenario.
+In order to be authenticated and aurthorized to call the Azure Comsumption API, we use Managed Identity and Access Control (IAM). Notice there might be better methods depends on your scenario.
 
 1. Turn on the Managed Identity in the logic app:
 
@@ -53,14 +51,15 @@ In order to be authenticated and aurthorized to call the Azure Comsumption API, 
 
 ## Step 4: Add Action
 
-In condition 3, edit threshold and actions once your burn rate is over the threshold. For example, you can send an email in outlook.
+In "condition 3" in the logic app designer view, edit threshold and actions. For example, you can send an email in outlook.
 
 ![alt text](https://github.com/wcex1994/burnrate/blob/master/pictures/actions.jpg "action")
 
 ## Further Adjustment
 
 1. Error control:
-    For example, if the previous day is 0, then how does it work to calculate the burn rate, you cannot divide something by 0.
+ 
+    E.g. If the cost of previous day is 0, then how does it work to calculate the burn rate, since we cannot divide something by 0.
 
 2. First day of month:
 
