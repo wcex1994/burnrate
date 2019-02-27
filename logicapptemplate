@@ -1,0 +1,404 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "For_each": {
+                "actions": {
+                    "Condition_3": {
+                        "actions": {},
+                        "expression": {
+                            "and": [
+                                {
+                                    "greaterOrEquals": [
+                                        "@variables('burnrate')",
+                                        1.5
+                                    ]
+                                }
+                            ]
+                        },
+                        "runAfter": {
+                            "Set_variable_3": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "If"
+                    },
+                    "Filter_TDBY": {
+                        "inputs": {
+                            "from": "@body('Parse_JSON')?['value']",
+                            "where": "@contains(item()?['properties']?['usageStart'], startOfDay(addDays(variables('TimeNow'), -2)))"
+                        },
+                        "runAfter": {
+                            "Parse_JSON": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Query"
+                    },
+                    "Filter_Three_Days_Before": {
+                        "inputs": {
+                            "from": "@body('Parse_JSON')?['value']",
+                            "where": "@contains(item()?['properties']?['usageStart'], startOfDay(addDays(variables('TimeNow'), -3)))"
+                        },
+                        "runAfter": {
+                            "Parse_JSON": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Query"
+                    },
+                    "For_each_2": {
+                        "actions": {
+                            "Increment_variable": {
+                                "inputs": {
+                                    "name": "TDBYCost",
+                                    "value": "@items('For_each_2')?['properties']?['pretaxCost']"
+                                },
+                                "runAfter": {},
+                                "type": "IncrementVariable"
+                            }
+                        },
+                        "foreach": "@body('Filter_TDBY')",
+                        "runAfter": {
+                            "Set_variable": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Foreach"
+                    },
+                    "For_each_4": {
+                        "actions": {
+                            "Increment_variable_2": {
+                                "inputs": {
+                                    "name": "ThreeDayBeforeCost",
+                                    "value": "@items('For_each_4')?['properties']?['pretaxCost']"
+                                },
+                                "runAfter": {},
+                                "type": "IncrementVariable"
+                            }
+                        },
+                        "foreach": "@body('Filter_Three_Days_Before')",
+                        "runAfter": {
+                            "Set_variable_2": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Foreach"
+                    },
+                    "HTTP_GET": {
+                        "inputs": {
+                            "authentication": {
+                                "type": "ManagedServiceIdentity"
+                            },
+                            "method": "GET",
+                            "queries": {
+                                "api-version": "2018-10-01"
+                            },
+                            "uri": "@{concat(variables('part1'),items('For_each'),variables('part2'))}"
+                        },
+                        "runAfter": {},
+                        "type": "Http"
+                    },
+                    "Parse_JSON": {
+                        "inputs": {
+                            "content": "@body('HTTP_GET')",
+                            "schema": {
+                                "properties": {
+                                    "value": {
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "properties": {
+                                                    "properties": {
+                                                        "accountName": {
+                                                            "type": "string"
+                                                        },
+                                                        "billingPeriodId": {
+                                                            "type": "string"
+                                                        },
+                                                        "chargesBilledSeparately": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "consumedService": {
+                                                            "type": "string"
+                                                        },
+                                                        "costCenter": {
+                                                            "type": "string"
+                                                        },
+                                                        "currency": {
+                                                            "type": "string"
+                                                        },
+                                                        "departmentName": {
+                                                            "type": "string"
+                                                        },
+                                                        "instanceId": {
+                                                            "type": "string"
+                                                        },
+                                                        "instanceLocation": {
+                                                            "type": "string"
+                                                        },
+                                                        "instanceName": {
+                                                            "type": "string"
+                                                        },
+                                                        "isEstimated": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "location": {
+                                                            "type": "string"
+                                                        },
+                                                        "meterDetails": {},
+                                                        "meterId": {
+                                                            "type": "string"
+                                                        },
+                                                        "offerId": {
+                                                            "type": "string"
+                                                        },
+                                                        "partNumber": {
+                                                            "type": "string"
+                                                        },
+                                                        "pretaxCost": {
+                                                            "type": "number"
+                                                        },
+                                                        "product": {
+                                                            "type": "string"
+                                                        },
+                                                        "resourceGuid": {
+                                                            "type": "string"
+                                                        },
+                                                        "subscriptionGuid": {
+                                                            "type": "string"
+                                                        },
+                                                        "subscriptionName": {
+                                                            "type": "string"
+                                                        },
+                                                        "usageEnd": {
+                                                            "type": "string"
+                                                        },
+                                                        "usageQuantity": {
+                                                            "type": "number"
+                                                        },
+                                                        "usageStart": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "type": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "type",
+                                                "properties"
+                                            ],
+                                            "type": "object"
+                                        },
+                                        "type": "array"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "runAfter": {
+                            "HTTP_GET": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "ParseJson"
+                    },
+                    "Set_variable": {
+                        "inputs": {
+                            "name": "TDBYCost",
+                            "value": 0
+                        },
+                        "runAfter": {
+                            "Filter_TDBY": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "SetVariable"
+                    },
+                    "Set_variable_2": {
+                        "inputs": {
+                            "name": "ThreeDayBeforeCost",
+                            "value": 0
+                        },
+                        "runAfter": {
+                            "Filter_Three_Days_Before": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "SetVariable"
+                    },
+                    "Set_variable_3": {
+                        "inputs": {
+                            "name": "burnrate",
+                            "value": "@div(sub(variables('TDBYCost'),variables('ThreeDayBeforeCost')),variables('ThreeDayBeforeCost'))"
+                        },
+                        "runAfter": {
+                            "For_each_2": [
+                                "Succeeded"
+                            ],
+                            "For_each_4": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "SetVariable"
+                    }
+                },
+                "foreach": "@variables('subscriptionid')",
+                "runAfter": {
+                    "burnrate": [
+                        "Succeeded"
+                    ]
+                },
+                "runtimeConfiguration": {
+                    "concurrency": {
+                        "repetitions": 1
+                    }
+                },
+                "type": "Foreach"
+            },
+            "Sublist": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "subscriptionid",
+                            "type": "Array",
+                            "value": "[\n  \"subscriptionid1\",\n \"subscriptionid2\",\n \"subscriptionid3\",\n]"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Time_Now": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "TDBYCost": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TDBYCost",
+                            "type": "Float",
+                            "value": 0
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "part2": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Three_Day_Before_Cost": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "ThreeDayBeforeCost",
+                            "type": "Float",
+                            "value": 0
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "TDBYCost": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Time_Now": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TimeNow",
+                            "type": "String",
+                            "value": "@{utcNow()}"
+                        }
+                    ]
+                },
+                "runAfter": {},
+                "type": "InitializeVariable"
+            },
+            "burnrate": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "burnrate",
+                            "type": "Float",
+                            "value": 0
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Three_Day_Before_Cost": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "part1": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "part1",
+                            "type": "String",
+                            "value": "https://management.azure.com/subscriptions/"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Sublist": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "part2": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "part2",
+                            "type": "String",
+                            "value": "/providers/Microsoft.Consumption/usageDetails?api-version=2018-10-01"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "part1": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {},
+        "triggers": {
+            "Recurrence": {
+                "recurrence": {
+                    "frequency": "Day",
+                    "interval": 1,
+                    "schedule": {
+                        "hours": [
+                            "6"
+                        ]
+                    },
+                    "timeZone": "UTC"
+                },
+                "type": "Recurrence"
+            }
+        }
+    }
+}
