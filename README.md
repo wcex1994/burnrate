@@ -64,6 +64,10 @@ In "condition 3" in the logic app designer view, edit threshold and actions. For
 2. First day of month:
 
     The Consumption.UsageDetails.List API only returns current billing period's usage. Azure counts one month as a billing period. If you are on Feb 1st, then to calculate Jan 30th vs. Jan 31st burn rate, you would need to call Consumption.UsageDetails.ListByBillingPeriod API with '201901' as the billing period. See here <https://docs.microsoft.com/en-us/rest/api/consumption/usagedetails/listbybillingperiod> for more details.
+    
+3. Recurrence:
+    
+    I would recommend to have recurrence three times a day (morning, afternoon and night) just to double check. 
 
 ## Additional Information
 
